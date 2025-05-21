@@ -12,25 +12,45 @@ class AuthController extends Controller
 {
     public function register(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed'
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'surname' => 'required|string|max:255',
+                'phone_number' => 'required|string|min:8|max:20|unique:users',
+                'adress_delivery' => 'required|string|min:8',
+                'password' => 'required|string|min:8',
+            ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password'])
-        ]);
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'surname' => $validated['surname'],
+                'phone_number' => $validated['phone_number'],
+                'adress_delivery' => $validated['adress_delivery'],
+                'role' => 'user'
+            ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+            if (!$user) {
+                throw new \Exception('Failed to create user');
+            }
 
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $user->only(['id', 'name', 'email'])
-        ], 201);
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' => $user->only(['id', 'name', 'email', 'role'])
+            ], 201);
+
+        } catch (\Exception $e) {
+            \Log::error('Registration error: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Registration failed',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function login(Request $request): JsonResponse
@@ -59,7 +79,7 @@ class AuthController extends Controller
     public function logout(Request $request): JsonResponse
     {
         $request->user()->tokens()->delete();
-//ДОМИР ЛЕНИЙВЫЙ ХУЙ
+
         return response()->json([
             'message' => __('auth.logout_success')
         ]);

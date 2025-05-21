@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
@@ -24,4 +25,12 @@ Route::get('/users', [UserController::class, 'index']);
 Route::get('/users/{user}', [UserController::class, 'show']);
 Route::put('/users/{user}', [UserController::class, 'update']);
 
+
 Route::get('/orders', [OrderController::class, 'index']);
+
+Route::get('/carts', [CartController::class, 'index'])->middleware('auth:sanctum');
+Route::get('/carts/{cart}', [CartController::class, 'show'])->middleware('auth:sanctum');
+Route::post('/carts', [CartController::class, 'store'])->middleware('auth:sanctum');
+Route::delete('/carts/{cart}', [CartController::class, 'destroy'])->middleware('auth:sanctum');
+Route::put('/carts/{cart}', [CartController::class, 'update'])->middleware('auth:sanctum');
+

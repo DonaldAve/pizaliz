@@ -14,6 +14,12 @@ class Cart extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'user_id',
+        'product_id'
+        // Добавьте другие поля, если они есть
+    ];
+
     public function products(): BelongsToMany
     {
         return $this->BelongsToMany(Product::class, 'cart_product');
