@@ -26,7 +26,8 @@ Route::get('/users/{user}', [UserController::class, 'show']);
 Route::put('/users/{user}', [UserController::class, 'update']);
 
 
-Route::get('/orders', [OrderController::class, 'index']);
+Route::get('/orders', [OrderController::class, 'index'])->middleware('auth:sanctum');
+Route::get('/orders/{order}', [OrderController::class, 'show'])->middleware('auth:sanctum');
 
 Route::get('/carts', [CartController::class, 'index'])->middleware('auth:sanctum');
 Route::get('/carts/{cart}', [CartController::class, 'show'])->middleware('auth:sanctum');
